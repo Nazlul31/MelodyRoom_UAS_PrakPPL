@@ -1,9 +1,10 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView, LogoutView
+from django.db import models
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -373,22 +374,64 @@ def admin_floor_plan(request):
     rooms = Room.objects.filter(is_active=True).select_related('room_type')
     room_data = []
     now = timezone.localtime()
+    today = now.date()
+    yesterday = today - timedelta(days=1)
+    current_time = now.time()
+
     for room in rooms:
-        # Ambil booking LUNAS yang sedang aktif
+        # Cari booking LUNAS yang sedang aktif — handle cross-midnight
+        # Kasus 1: booking normal hari ini (start <= now <= end, end > start)
+        # Kasus 2: cross-midnight hari ini (start <= now, end < start → belum lewat tengah malam)
+        # Kasus 3: cross-midnight dari kemarin (booking_date=kemarin, end > now)
         active = room.bookings.filter(
             status=Booking.Status.LUNAS,
-            booking_date=now.date(),
-            start_time__lte=now.time(),
-            end_time__gt=now.time(),
+            booking_date=today,
+            start_time__lte=current_time,
+            end_time__gt=current_time,
         ).first()
 
-        # Ambil booking PENDING yang sedang terjadwal sekarang
+        if not active:
+            # Cross-midnight: booking hari ini, end_time < start_time (lewat tengah malam)
+            # dan sekarang belum tengah malam (masih di sisi start)
+            active = room.bookings.filter(
+                status=Booking.Status.LUNAS,
+                booking_date=today,
+                start_time__lte=current_time,
+                end_time__lt=models.F('start_time'),  # cross-midnight
+            ).first()
+
+        if not active:
+            # Cross-midnight dari kemarin: booking_date kemarin, end_time > now (sudah lewat tengah malam)
+            active = room.bookings.filter(
+                status=Booking.Status.LUNAS,
+                booking_date=yesterday,
+                end_time__gt=current_time,
+                end_time__lt=models.F('start_time'),  # end < start = cross-midnight
+            ).first()
+
+        # Sama untuk PENDING
         pending = room.bookings.filter(
             status=Booking.Status.PENDING,
-            booking_date=now.date(),
-            start_time__lte=now.time(),
-            end_time__gt=now.time(),
+            booking_date=today,
+            start_time__lte=current_time,
+            end_time__gt=current_time,
         ).first()
+
+        if not pending:
+            pending = room.bookings.filter(
+                status=Booking.Status.PENDING,
+                booking_date=today,
+                start_time__lte=current_time,
+                end_time__lt=models.F('start_time'),
+            ).first()
+
+        if not pending:
+            pending = room.bookings.filter(
+                status=Booking.Status.PENDING,
+                booking_date=yesterday,
+                end_time__gt=current_time,
+                end_time__lt=models.F('start_time'),
+            ).first()
 
         remaining = None
         if active:
