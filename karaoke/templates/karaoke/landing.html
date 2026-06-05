@@ -1,179 +1,520 @@
 {% extends 'karaoke/base.html' %}
 {% load karaoke_extras %}
 
-{% block title %}Selamat Datang — MelodyRoom Karaoke{% endblock %}
+{% block title %}MelodyRoom — Karaoke Room Reservasi Premium{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ---- HERO ---- */
+  .hero {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--bg-dark);
+  }
+  .hero-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    opacity: 0.18;
+  }
+  .hero-blob-1 {
+    width: 600px; height: 600px;
+    top: -150px; right: -100px;
+    background: radial-gradient(circle, var(--primary), transparent 70%);
+  }
+  .hero-blob-2 {
+    width: 500px; height: 500px;
+    bottom: -100px; left: -80px;
+    background: radial-gradient(circle, var(--accent), transparent 70%);
+  }
+  .hero-blob-3 {
+    width: 300px; height: 300px;
+    top: 40%; left: 40%;
+    background: radial-gradient(circle, var(--primary-light), transparent 70%);
+    opacity: 0.08;
+  }
+  .hero-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; text-align: center; }
+    .hero-right { display: none; }
+    .hero-btns { justify-content: center; }
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(124,58,237,0.4);
+    background: rgba(124,58,237,0.1);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    letter-spacing: 0.04em;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  .hero-headline {
+    font-size: clamp(2.4rem, 5.5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--text-primary);
+    animation: fadeUp 0.6s 0.1s ease both;
+    margin-bottom: 20px;
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 480px;
+    line-height: 1.75;
+    animation: fadeUp 0.6s 0.2s ease both;
+    margin-bottom: 36px;
+  }
+  .hero-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .btn-hero-primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 8px 32px var(--primary-glow);
+  }
+  .btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px var(--primary-glow);
+    opacity: 0.93;
+  }
+  .btn-hero-secondary {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-hero-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.25);
+  }
+  /* Hero right graphic */
+  .hero-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 420px;
+  }
+  .hero-orb {
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+    animation: spin-slow 20s linear infinite;
+  }
+  .hero-orb::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary));
+    z-index: -1;
+    animation: spin-slow 20s linear infinite reverse;
+  }
+  .hero-orb-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: spin-slow 20s linear infinite reverse;
+  }
+  .hero-orb-emoji { font-size: 5rem; }
+  .hero-note {
+    position: absolute;
+    font-size: 2rem;
+    animation: float 3.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 12px var(--primary));
+  }
+  .hero-note-1 { top: 30px; left: 30px; animation-delay: 0s; }
+  .hero-note-2 { bottom: 40px; right: 20px; animation-delay: 0.8s; font-size: 2.4rem; }
+  .hero-note-3 { top: 50%; right: -10px; animation-delay: 1.5s; font-size: 1.6rem; }
+
+  /* ---- ABOUT SECTION ---- */
+  .about-section {
+    padding: 100px 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .about-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  @media (max-width: 768px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .about-image-wrap { order: -1; }
+  }
+  .about-image-wrap { position: relative; }
+  .about-image-glow {
+    position: absolute;
+    inset: -8px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    opacity: 0.15;
+    blur: 20px;
+    filter: blur(20px);
+  }
+  .about-image-wrap img {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+    aspect-ratio: 4/3;
+    border: 1px solid var(--border);
+    z-index: 1;
+  }
+  .about-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .about-feature {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .about-check {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: var(--primary-glow);
+    border: 1px solid rgba(124,58,237,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .about-feature h4 { font-size: 0.875rem; font-weight: 700; color: var(--text-primary); }
+  .about-feature p { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* ---- FACILITIES ---- */
+  .facilities-section {
+    padding: 100px 0;
+    background: var(--bg-dark);
+  }
+  .section-header {
+    text-align: center;
+    max-width: 560px;
+    margin: 0 auto 56px;
+  }
+  .section-header h2 {
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+  .section-header p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .facilities-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .facility-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+  .facility-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px var(--primary-glow);
+  }
+  .facility-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary-glow), var(--accent-glow));
+    border: 1px solid rgba(124,58,237,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  .facility-card:hover .facility-icon {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-color: transparent;
+  }
+  .facility-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .facility-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* ---- CTA SECTION ---- */
+  .cta-section {
+    padding: 80px 24px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+  }
+  .cta-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.1));
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 24px;
+    padding: 60px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-blob-1 {
+    position: absolute; top: -60px; left: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--primary);
+    filter: blur(80px); opacity: 0.15;
+    pointer-events: none;
+  }
+  .cta-blob-2 {
+    position: absolute; bottom: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--accent);
+    filter: blur(80px); opacity: 0.12;
+    pointer-events: none;
+  }
+  .cta-inner h2 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+  .cta-inner p {
+    color: var(--text-muted);
+    max-width: 440px;
+    margin: 0 auto 32px;
+    line-height: 1.7;
+  }
+  .cta-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 640px) {
+    .cta-inner { padding: 40px 24px; }
+    .about-features { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- HERO SECTION -->
-<section class="relative min-h-[85vh] flex items-center overflow-hidden bg-slate-950 text-white">
-  <!-- Glowing Gradients & Effects -->
-  <div class="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay"
-    style="background-image: url('{% hero_image %}');"></div>
-  <div class="absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full bg-indigo-600/20 blur-[120px]"></div>
-  <div class="absolute -bottom-40 -right-40 h-[600px] w-[600px] rounded-full bg-pink-600/20 blur-[120px]"></div>
 
-  <div class="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
-    <div class="grid gap-12 lg:grid-cols-12 lg:items-center">
-      <!-- Left Hero Content -->
-      <div class="lg:col-span-7 space-y-8 text-left">
-        <div
-          class="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-sm font-semibold tracking-wide text-indigo-300">
-          <span class="flex h-2 w-2 rounded-full bg-indigo-400 "></span>
-          Karaoke Room Terpopuler #1
-        </div>
-        <h1 class="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl leading-[1.1]">
-          Ruang Privat,<br>
-          <span
-            class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Kenyamanan
-            Maksimal.</span>
-        </h1>
-        <p class="max-w-xl text-lg text-slate-300 leading-relaxed">
-          Temukan pengalaman bernyanyi tak terlupakan dengan teknologi audio terbaik, ruangan kedap suara premium, dan
-          pemesanan online instan.
-        </p>
-        <div class="flex flex-wrap gap-4">
-          <a href="{% url 'room_type_list' %}" class="btn btn-primary px-8 py-3.5">
-            Lihat Ruangan
-            <svg class="ml-2 -mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </a>
-          <a href="{% url 'schedule' %}"
-            class="btn btn-secondary bg-white/10 border-white/20 text-white hover:bg-white/25 px-8 py-3.5">
-            Jadwal Ketersediaan
-          </a>
+<!-- ========== HERO ========== -->
+<section class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+
+  <div class="hero-grid">
+    <!-- Left Content -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Karaoke Room Premium #1
+      </div>
+      <h1 class="hero-headline">
+        Ruang Privat,<br>
+        <span class="gradient-text">Kenyamanan</span><br>
+        Maksimal.
+      </h1>
+      <p class="hero-sub">
+        Temukan pengalaman bernyanyi tak terlupakan dengan teknologi audio premium, ruangan kedap suara, dan pemesanan online instan — kapan saja, di mana saja.
+      </p>
+      <div class="hero-btns">
+        <a href="{% url 'room_type_list' %}" class="btn-hero-primary">
+          Lihat Ruangan
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </a>
+        <a href="{% url 'schedule' %}" class="btn-hero-secondary">
+          Cek Jadwal
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Graphic -->
+    <div class="hero-right">
+      <div class="hero-orb">
+        <div class="hero-orb-inner">
+          <span class="hero-orb-emoji">🎤</span>
         </div>
       </div>
-
-      <!-- Right Hero Graphic -->
-      <div class="hidden lg:block lg:col-span-5 relative">
-        <div
-          class="relative mx-auto w-72 h-72 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 animate-spin-slow shadow-2xl shadow-indigo-500/20">
-          <div class="h-full w-full rounded-full bg-slate-950 flex items-center justify-center">
-            <!-- Floating music icons -->
-            <span class="text-6xl animate-bounce">🎤</span>
-          </div>
-        </div>
-        <!-- Floating notes -->
-        <span class="absolute top-10 left-10 text-3xl animate-pulse delay-75">🎵</span>
-        <span class="absolute bottom-10 right-10 text-4xl animate-pulse delay-300">🎶</span>
-        <span class="absolute top-1/2 right-0 text-2xl animate-bounce delay-150">✨</span>
-      </div>
+      <span class="hero-note hero-note-1">🎵</span>
+      <span class="hero-note hero-note-2">🎶</span>
+      <span class="hero-note hero-note-3">✨</span>
     </div>
   </div>
 </section>
 
-<!-- ABOUT SECTION -->
-<section class="py-24 bg-white">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <div class="grid items-center gap-12 lg:grid-cols-2">
-      <div class="relative">
-        <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 opacity-20 blur-lg">
-        </div>
-        <img src="{% about_image %}" alt="Ruang karaoke premium"
-          class="relative rounded-2xl shadow-xl w-full object-cover aspect-[4/3] ring-1 ring-slate-200" loading="lazy">
-      </div>
-      <div class="space-y-6">
-        <div class="text-xs font-bold uppercase tracking-wider text-indigo-600">Tentang MelodyRoom</div>
-        <h2 class="font-heading text-3xl font-extrabold text-slate-900 sm:text-4xl">Sistem Booking Karaoke Modern &
-          Instan</h2>
-        <p class="text-slate-500 leading-relaxed">
-          MelodyRoom hadir untuk mempermudah Anda dalam memesan ruang karaoke keluarga secara online. Tanpa antre, tanpa
-          ribet. Anda bisa mengecek ketersediaan ruang secara real-time dan langsung memesan paket pilihan Anda.
-        </p>
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div class="flex items-start gap-3">
-            <span
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">✓</span>
-            <div>
-              <h4 class="font-semibold text-slate-800 text-sm">Reservasi Real-Time</h4>
-              <p class="text-xs text-slate-500 mt-0.5">Jadwal yang selalu terupdate otomatis.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <span
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">✓</span>
-            <div>
-              <h4 class="font-semibold text-slate-800 text-sm">Paket Hemat Beragam</h4>
-              <p class="text-xs text-slate-500 mt-0.5">Pilihan durasi sesuai kebutuhan.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <span
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">✓</span>
-            <div>
-              <h4 class="font-semibold text-slate-800 text-sm">Kemudahan Akses</h4>
-              <p class="text-xs text-slate-500 mt-0.5">Kelola pesanan dari akun pribadi.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <span
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">✓</span>
-            <div>
-              <h4 class="font-semibold text-slate-800 text-sm">Audio Premium</h4>
-              <p class="text-xs text-slate-500 mt-0.5">Kualitas suara jernih & bass dahsyat.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- ========== ABOUT ========== -->
+<section class="about-section">
+  <div class="about-grid">
+    <div class="about-image-wrap">
+      <div class="about-image-glow"></div>
+      <img src="{% about_image %}" alt="Ruang karaoke premium MelodyRoom" loading="lazy">
     </div>
-  </div>
-</section>
-
-<!-- FACILITIES SECTION -->
-{% if facilities %}
-<section class="bg-slate-50 py-24 border-y border-slate-200/50">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="text-xs font-bold uppercase tracking-wider text-indigo-600">Fasilitas Premium</div>
-      <h2 class="font-heading mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">Kenyamanan Maksimal untuk Anda
+    <div>
+      <span class="section-label">Tentang MelodyRoom</span>
+      <h2 style="font-size:clamp(1.6rem,2.8vw,2.2rem);font-weight:800;letter-spacing:-0.03em;color:var(--text-primary);margin-bottom:16px;line-height:1.2;">
+        Sistem Booking Karaoke<br>Modern & Instan
       </h2>
-      <p class="mt-4 text-slate-500">Kami menyediakan fasilitas terbaik untuk memastikan pengalaman menyanyi Anda luar
-        biasa.</p>
-    </div>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {% for f in facilities %}
-      <div
-        class="group rounded-2xl bg-white border border-slate-200/60 p-8 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-300 transform hover:-translate-y-1">
-        <div
-          class="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-50 text-3xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition duration-300">
-          {{ f.icon|default:"🎤" }}
+      <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.75;">
+        MelodyRoom hadir untuk mempermudah pemesanan ruang karaoke secara online. Tanpa antre, tanpa ribet. Cek ketersediaan real-time dan langsung pesan paket pilihan Anda.
+      </p>
+      <div class="about-features">
+        <div class="about-feature">
+          <div class="about-check">✓</div>
+          <div>
+            <h4>Reservasi Real-Time</h4>
+            <p>Jadwal selalu terupdate otomatis.</p>
+          </div>
         </div>
-        <h3 class="mt-6 font-heading text-lg font-bold text-slate-800">{{ f.name }}</h3>
-        <p class="mt-2 text-sm text-slate-500 leading-relaxed">{{ f.description }}</p>
+        <div class="about-feature">
+          <div class="about-check">✓</div>
+          <div>
+            <h4>Paket Hemat Beragam</h4>
+            <p>Pilihan durasi sesuai kebutuhan.</p>
+          </div>
+        </div>
+        <div class="about-feature">
+          <div class="about-check">✓</div>
+          <div>
+            <h4>Kemudahan Akses</h4>
+            <p>Kelola pesanan dari akun pribadi.</p>
+          </div>
+        </div>
+        <div class="about-feature">
+          <div class="about-check">✓</div>
+          <div>
+            <h4>Audio Premium</h4>
+            <p>Kualitas suara jernih & bas dahsyat.</p>
+          </div>
+        </div>
       </div>
-      {% endfor %}
     </div>
+  </div>
+</section>
+
+<!-- ========== FACILITIES ========== -->
+{% if facilities %}
+<section class="facilities-section">
+  <div class="section-container">
+    <div class="section-header">
+      <span class="section-label">Fasilitas Premium</span>
+      <h2>Kenyamanan Maksimal untuk Anda</h2>
+      <p>Kami menyediakan fasilitas terbaik agar pengalaman menyanyi Anda benar-benar luar biasa.</p>
+    </div>
+  </div>
+  <div class="facilities-grid">
+    {% for f in facilities %}
+    <div class="facility-card">
+      <div class="facility-icon">{{ f.icon|default:"🎤" }}</div>
+      <h3>{{ f.name }}</h3>
+      <p>{{ f.description }}</p>
+    </div>
+    {% endfor %}
   </div>
 </section>
 {% endif %}
 
-<!-- CTA SECTION -->
-<section class="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
-  <div class="relative overflow-hidden rounded-3xl bg-indigo-600 px-8 py-16 text-center text-white shadow-2xl">
-    <div class="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-indigo-500 blur-xl opacity-50"></div>
-    <div class="absolute -bottom-24 -right-24 h-48 w-48 rounded-full bg-purple-500 blur-xl opacity-50"></div>
-
-    <div class="relative max-w-2xl mx-auto space-y-6">
-      <h2 class="font-heading text-3xl font-extrabold sm:text-4xl">Tunggu Apa Lagi? Siap Menyanyi!</h2>
-      <p class="text-indigo-100 max-w-lg mx-auto">
-        Daftarkan akun member Anda sekarang untuk memulai pemesanan ruangan karaoke favorit Anda.
-      </p>
-      <div class="pt-4 flex justify-center gap-4">
-        {% if user.is_authenticated %}
-        <a href="{% url 'room_type_list' %}" class="btn bg-white text-indigo-600 hover:bg-indigo-50 shadow-md">
-          Pesan Sekarang
-        </a>
-        {% else %}
-        <a href="{% url 'register' %}" class="btn bg-white text-indigo-600 hover:bg-indigo-50 shadow-md">
-          Daftar Gratis
-        </a>
-        <a href="{% url 'login' %}" class="btn border border-white/30 text-white hover:bg-white/10">
-          Masuk Akun
-        </a>
-        {% endif %}
-      </div>
+<!-- ========== CTA ========== -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-blob-1"></div>
+    <div class="cta-blob-2"></div>
+    <h2>Tunggu Apa Lagi? <span class="gradient-text">Siap Menyanyi!</span></h2>
+    <p>Daftarkan akun member Anda sekarang dan mulai pesan ruang karaoke favorit dalam hitungan detik.</p>
+    <div class="cta-btns">
+      {% if user.is_authenticated %}
+      <a href="{% url 'room_type_list' %}" class="btn btn-primary btn-lg btn-pill">Pesan Sekarang</a>
+      {% else %}
+      <a href="{% url 'register' %}" class="btn btn-primary btn-lg btn-pill">Daftar Gratis</a>
+      <a href="{% url 'login' %}" class="btn btn-ghost btn-lg btn-pill">Masuk Akun</a>
+      {% endif %}
     </div>
   </div>
 </section>
+
 {% endblock %}

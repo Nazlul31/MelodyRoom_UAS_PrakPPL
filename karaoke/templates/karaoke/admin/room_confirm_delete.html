@@ -1,33 +1,28 @@
 {% extends 'karaoke/admin/base_admin.html' %}
 
-{% block title %}Konfirmasi Hapus Ruangan — MelodyRoom Admin{% endblock %}
+{% block title %}Konfirmasi Hapus — MelodyRoom Admin{% endblock %}
 
 {% block admin_content %}
-<div class="mx-auto max-w-md py-8">
-  <div class="overflow-hidden rounded-2xl border border-rose-100 bg-white shadow-xl">
-    <!-- Header alert -->
-    <div class="bg-rose-50 px-6 py-6 text-center text-rose-800 border-b border-rose-150">
-      <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-2xl mb-2">
-        ⚠️
-      </div>
-      <h1 class="font-heading text-xl font-extrabold">Hapus Ruangan?</h1>
-      <p class="text-xs text-rose-700 mt-1">Tindakan ini tidak dapat dibatalkan!</p>
+<div style="max-width:440px;margin:0 auto;">
+  <div style="background:var(--bg-card);border:1px solid rgba(239,68,68,0.25);border-radius:16px;overflow:hidden;">
+    <!-- Header -->
+    <div style="padding:32px 32px 24px;text-align:center;border-bottom:1px solid rgba(239,68,68,0.15);background:rgba(239,68,68,0.05);">
+      <div style="width:56px;height:56px;border-radius:16px;background:var(--danger-glow);border:1px solid rgba(239,68,68,0.3);display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">⚠️</div>
+      <h1 style="font-size:1.3rem;font-weight:800;letter-spacing:-0.03em;color:var(--text-primary);margin-bottom:4px;">Hapus Ruangan?</h1>
+      <p style="font-size:0.8rem;color:#FCA5A5;">Tindakan ini tidak dapat dibatalkan!</p>
     </div>
 
-    <!-- Details and Form -->
-    <div class="p-6 sm:p-8 space-y-6">
-      <p class="text-sm text-slate-500 text-center leading-relaxed">
-        Apakah Anda yakin ingin menghapus ruangan fisik <strong class="text-slate-800">{{ room.room_code }} — {{ room.name }}</strong> dari database MelodyRoom?
+    <!-- Body -->
+    <div style="padding:28px 32px;">
+      <p style="font-size:0.875rem;color:var(--text-muted);text-align:center;line-height:1.7;margin-bottom:24px;">
+        Apakah Anda yakin ingin menghapus ruangan
+        <strong style="color:var(--text-primary);">{{ room.room_code }} — {{ room.name }}</strong>
+        dari sistem MelodyRoom?
       </p>
-
-      <form method="post" class="flex gap-3">
+      <form method="post" style="display:flex;gap:10px;">
         {% csrf_token %}
-        <button type="submit" class="flex-1 btn btn-danger py-3">
-          Ya, Hapus Ruangan
-        </button>
-        <a href="{% url 'admin_room_list' %}" class="flex-1 btn btn-secondary py-3 text-center">
-          Batal
-        </a>
+        <button type="submit" class="btn btn-danger btn-pill" style="flex:1;padding:12px;">Ya, Hapus</button>
+        <a href="{% url 'admin_room_list' %}" class="btn btn-secondary btn-pill" style="flex:1;padding:12px;text-align:center;">Batal</a>
       </form>
     </div>
   </div>

@@ -1,345 +1,810 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth h-full">
+<html lang="id" class="scroll-smooth">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}MelodyRoom{% endblock %}</title>
-  <meta name="description"
-    content="MelodyRoom — Sistem Reservasi & Informasi Penyewaan Ruang Karaoke Premium Berbasis Waktu.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-            heading: ['Outfit', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              DEFAULT: '#6366f1',
-              dark: '#4f46e5',
-              light: '#eef2ff',
-              navy: '#0f172a',
-            },
-          },
-        },
-      },
-    };
-  </script>
-  <style type="text/tailwindcss">
-    @layer components {
-      .form-control {
-        @apply w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-2.5 text-slate-800 shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition duration-200 backdrop-blur-sm;
-      }
-      .btn {
-        @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold tracking-wide transition-all duration-300 focus:outline-none focus:ring-4 active:scale-95;
-      }
-      .btn-primary {
-        @apply bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md hover:from-indigo-700 hover:to-violet-700 hover:shadow-indigo-500/25 hover:shadow-lg focus:ring-indigo-500/30;
-      }
-      .btn-secondary {
-        @apply border border-slate-200 bg-white/80 text-slate-700 hover:bg-slate-50 hover:border-slate-300 focus:ring-slate-100 backdrop-blur-sm;
-      }
-      .btn-danger {
-        @apply bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-md hover:from-rose-600 hover:to-red-700 hover:shadow-rose-500/25 focus:ring-rose-500/30;
-      }
-      .btn-sm {
-        @apply px-4 py-2 text-xs rounded-lg;
-      }
-      .form-group {
-        @apply space-y-1.5 mb-5;
-      }
-      .form-error {
-        @apply text-xs font-semibold text-rose-600 mt-1 flex items-center gap-1;
-      }
-      .badge {
-        @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide;
-      }
-      .badge-pending {
-        @apply bg-amber-50 text-amber-800 ring-1 ring-amber-200;
-      }
-      .badge-lunas {
-        @apply bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200;
-      }
-      .badge-batal {
-        @apply bg-rose-50 text-rose-800 ring-1 ring-rose-200;
-      }
+  <meta name="description" content="MelodyRoom — Reservasi Ruang Karaoke Premium. Booking online, real-time, instan." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       CSS VARIABLES — COLOR SYSTEM
+    ============================================= */
+    :root {
+      --primary:        #7C3AED;
+      --primary-light:  #8B5CF6;
+      --primary-dark:   #6D28D9;
+      --primary-glow:   rgba(124, 58, 237, 0.18);
+      --accent:         #EC4899;
+      --accent-glow:    rgba(236, 72, 153, 0.14);
+      --bg-dark:        #0A0A0F;
+      --bg-card:        #111118;
+      --bg-elevated:    #1A1A26;
+      --bg-hover:       #1F1F2E;
+      --border:         rgba(255,255,255,0.07);
+      --border-hover:   rgba(255,255,255,0.14);
+      --text-primary:   #F1F0FF;
+      --text-secondary: #C4C2D4;
+      --text-muted:     #6B6880;
+      --success:        #10B981;
+      --success-glow:   rgba(16,185,129,0.15);
+      --warning:        #F59E0B;
+      --warning-glow:   rgba(245,158,11,0.15);
+      --danger:         #EF4444;
+      --danger-glow:    rgba(239,68,68,0.15);
     }
-    @layer utilities {
-      .nav-link {
-        @apply text-slate-600 font-medium px-4 py-2 rounded-xl transition-all duration-200 hover:text-indigo-600 hover:bg-indigo-50/60;
-      }
-      .nav-link-active {
-        @apply text-indigo-600 bg-indigo-50/80 font-semibold backdrop-blur-sm;
-      }
-      .text-gradient {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600;
-      }
+
+    /* =============================================
+       BASE RESET & GLOBAL
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: var(--primary-glow);
+      color: var(--primary-light);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary-light); }
+
+    /* =============================================
+       NAVBAR
+    ============================================= */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .navbar-logo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .navbar-logo .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .logo-melody {
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-room { color: var(--text-primary); }
+
+    .navbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-link:hover, .nav-link-active {
+      color: var(--primary-light);
+      background: var(--primary-glow);
+    }
+    .nav-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 8px;
+    }
+    .btn-nav-cta {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px var(--primary-glow);
+      white-space: nowrap;
+    }
+    .btn-nav-cta:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+    .btn-nav-logout {
+      background: transparent;
+      color: var(--danger);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(239,68,68,0.25);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-nav-logout:hover {
+      background: var(--danger-glow);
+    }
+
+    /* Mobile Menu */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .mobile-menu-btn:hover { background: var(--bg-elevated); border-color: var(--border-hover); }
+    .mobile-menu {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: rgba(10,10,15,0.97);
+      backdrop-filter: blur(20px);
+      padding: 12px 24px 20px;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-nav-link {
+      display: block;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .mobile-nav-link:last-child { border-bottom: none; }
+    .mobile-nav-link:hover { color: var(--primary-light); }
+
+    @media (max-width: 768px) {
+      .navbar-nav { display: none; }
+      .mobile-menu-btn { display: flex; }
+    }
+
+    /* =============================================
+       FLASH MESSAGES
+    ============================================= */
+    .messages-container {
+      max-width: 1200px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .message-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      animation: slideDown 0.3s ease;
+    }
+    .message-item.success {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.25);
+      color: #6EE7B7;
+    }
+    .message-item.error {
+      background: var(--danger-glow);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #FCA5A5;
+    }
+    .message-item.warning {
+      background: var(--warning-glow);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: #FCD34D;
+    }
+    .message-item.info {
+      background: var(--primary-glow);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: #C4B5FD;
+    }
+    .message-close {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 1rem;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+    .message-close:hover { opacity: 1; }
+
+    /* =============================================
+       BUTTONS
+    ============================================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--primary-glow);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), #DC2626);
+      color: #fff;
+      box-shadow: 0 4px 16px var(--danger-glow);
+    }
+    .btn-danger:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: #fff;
+      box-shadow: 0 4px 16px var(--success-glow);
+    }
+
+    .btn-sm { padding: 7px 14px; font-size: 0.8rem; border-radius: 8px; }
+    .btn-lg { padding: 14px 28px; font-size: 1rem; border-radius: 12px; }
+    .btn-full { width: 100%; }
+    .btn-pill { border-radius: 999px; }
+
+    /* =============================================
+       FORM CONTROLS
+    ============================================= */
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .form-control,
+    input[type="text"].form-control,
+    input[type="email"].form-control,
+    input[type="password"].form-control,
+    input[type="date"].form-control,
+    input[type="time"].form-control,
+    input[type="number"].form-control,
+    textarea.form-control,
+    select.form-control {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .form-control::placeholder { color: var(--text-muted); }
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .form-control option {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+    .form-error {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #FCA5A5;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .form-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    /* =============================================
+       CARDS
+    ============================================= */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .card-elevated {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .card-hover {
+      transition: border-color 0.2s, transform 0.25s, box-shadow 0.25s;
+    }
+    .card-hover:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px var(--primary-glow);
+    }
+
+    /* =============================================
+       BADGES / STATUS
+    ============================================= */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .badge-lunas {
+      background: rgba(16,185,129,0.12);
+      color: #6EE7B7;
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+    .badge-pending {
+      background: rgba(245,158,11,0.12);
+      color: #FCD34D;
+      border: 1px solid rgba(245,158,11,0.25);
+    }
+    .badge-batal {
+      background: var(--danger-glow);
+      color: #FCA5A5;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+    .badge-vip {
+      background: linear-gradient(135deg, var(--primary-glow), var(--accent-glow));
+      color: var(--primary-light);
+      border: 1px solid rgba(124,58,237,0.3);
+    }
+
+    /* =============================================
+       SECTION / LAYOUT UTILS
+    ============================================= */
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .page-header {
+      padding: 60px 0 48px;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary-light);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary-light), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* =============================================
+       TABLE
+    ============================================= */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .data-table thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table thead th {
+      padding: 14px 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .data-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--bg-elevated); }
+    .data-table tbody td {
+      padding: 16px 20px;
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+
+    /* =============================================
+       STATUS DOT ANIMATIONS
+    ============================================= */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-14px); }
+    }
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 20px var(--primary-glow); }
+      50% { box-shadow: 0 0 40px var(--primary-glow), 0 0 60px var(--accent-glow); }
+    }
+
+    .animate-float { animation: float 3.5s ease-in-out infinite; }
+    .animate-float-slow { animation: float-slow 5s ease-in-out infinite; }
+    .animate-fade-up { animation: fadeUp 0.5s ease both; }
+    .animate-spin-slow { animation: spin-slow 18s linear infinite; }
+    .pulse-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    .footer {
+      margin-top: auto;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 56px 0 32px;
+    }
+    .footer-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 40px;
+    }
+    .footer-logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .footer p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .footer-heading {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .footer-link {
+      display: block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      padding: 5px 0;
+      transition: color 0.2s;
+    }
+    .footer-link:hover { color: var(--primary-light); }
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 32px auto 0;
+      padding: 24px 24px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* =============================================
+       MAIN CONTENT
+    ============================================= */
+    main { flex: 1; display: flex; flex-direction: column; }
+
+    /* Responsive padding */
+    @media (max-width: 640px) {
+      .section-container { padding: 0 16px; }
+      .navbar-inner { padding: 0 16px; }
     }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
 
-<body
-  class="min-h-full flex flex-col bg-slate-50 font-sans text-slate-800 antialiased selection:bg-indigo-100 selection:text-indigo-900">
+<body>
 
-  <header class="sticky top-0 z-50 border-b border-slate-200/60 bg-white/75 backdrop-blur-lg">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-20 items-center justify-between">
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <!-- Logo -->
+      {% if user.is_staff %}
+      <a href="{% url 'admin_dashboard' %}" class="navbar-logo">
+      {% elif user.is_authenticated %}
+      <a href="{% url 'beranda' %}" class="navbar-logo">
+      {% else %}
+      <a href="{% url 'landing' %}" class="navbar-logo">
+      {% endif %}
+        <span class="logo-icon">🎵</span>
+        <span><span class="logo-melody">Melody</span><span class="logo-room">Room</span></span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="navbar-nav">
         {% if user.is_staff %}
-        <a href="{% url 'admin_dashboard' %}"
-          class="font-heading text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2 transition hover:opacity-90">
-          {% elif user.is_authenticated %}
-          <a href="{% url 'beranda' %}"
-            class="font-heading text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2 transition hover:opacity-90">
-            {% else %}
-            <a href="{% url 'landing' %}"
-              class="font-heading text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2 transition hover:opacity-90">
-              {% endif %}
-              <span
-                class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md shadow-indigo-500/20">
-                <svg class="h-5 w-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                </svg>
-              </span>
-              Melody<span class="text-gradient">Room</span>
-            </a>
+          <a href="{% url 'admin_dashboard' %}" class="nav-link {% if current_path == '/dashboard-admin/' %}nav-link-active{% endif %}">Dashboard</a>
+          <a href="{% url 'admin_room_list' %}" class="nav-link {% if '/ruangan' in current_path %}nav-link-active{% endif %}">Kelola Ruangan</a>
+          <a href="{% url 'admin_booking_list' %}" class="nav-link {% if '/pesanan' in current_path %}nav-link-active{% endif %}">Kelola Pesanan</a>
+          <a href="{% url 'admin_floor_plan' %}" class="nav-link {% if '/denah' in current_path %}nav-link-active{% endif %}">Denah</a>
+          <span class="nav-divider"></span>
+          <form action="{% url 'logout' %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-nav-logout">Keluar</button>
+          </form>
+        {% else %}
+          {% if user.is_authenticated %}
+          <a href="{% url 'beranda' %}" class="nav-link {% if current_path == '/beranda/' %}nav-link-active{% endif %}">Dashboard</a>
+          {% endif %}
+          <a href="{% url 'room_type_list' %}" class="nav-link {% if '/ruangan/' in current_path %}nav-link-active{% endif %}">Ruangan</a>
+          <a href="{% url 'schedule' %}" class="nav-link {% if current_path == '/jadwal/' %}nav-link-active{% endif %}">Jadwal</a>
+          {% if user.is_authenticated %}
+          <a href="{% url 'my_bookings' %}" class="nav-link {% if '/pesanan-saya' in current_path %}nav-link-active{% endif %}">Pesanan Saya</a>
+          <span class="nav-divider"></span>
+          <form action="{% url 'logout' %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-nav-logout">Keluar</button>
+          </form>
+          <a href="{% url 'booking_create' %}" class="btn-nav-cta" style="margin-left:8px;">Pesan Ruang</a>
+          {% else %}
+          <span class="nav-divider"></span>
+          <a href="{% url 'login' %}" class="nav-link">Masuk</a>
+          <a href="{% url 'register' %}" class="btn btn-ghost btn-sm" style="margin-right:4px;">Daftar</a>
+          <a href="{% url 'login' %}?next={% url 'booking_create' %}" class="btn-nav-cta">Pesan Sekarang</a>
+          {% endif %}
+        {% endif %}
+      </nav>
 
-            <nav class="hidden md:flex items-center gap-1 lg:gap-2">
-              {% if user.is_staff %}
-              <a href="{% url 'admin_dashboard' %}"
-                class="nav-link {% if current_path == '/dashboard-admin/' %}nav-link-active{% endif %}">Dashboard</a>
-              <a href="{% url 'admin_room_list' %}"
-                class="nav-link {% if '/ruangan' in current_path %}nav-link-active{% endif %}">Kelola Ruangan</a>
-              <a href="{% url 'admin_booking_list' %}"
-                class="nav-link {% if '/pesanan' in current_path %}nav-link-active{% endif %}">Kelola Pesanan</a>
-              <a href="{% url 'admin_floor_plan' %}"
-                class="nav-link {% if '/denah' in current_path %}nav-link-active{% endif %}">Denah</a>
-              <div class="h-6 w-px bg-slate-200 mx-2"></div>
-              <form action="{% url 'logout' %}" method="post" class="inline">
-                {% csrf_token %}
-                <button type="submit"
-                  class="btn btn-secondary btn-sm text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-100">
-                  Keluar
-                </button>
-              </form>
-              {% else %}
-              {% if user.is_authenticated %}
-              <a href="{% url 'beranda' %}"
-                class="nav-link {% if current_path == '/beranda/' %}nav-link-active{% endif %}">Dashboard</a>
-              {% endif %}
-              <a href="{% url 'room_type_list' %}"
-                class="nav-link {% if current_path == '/ruangan/' or '/ruangan/' in current_path %}nav-link-active{% endif %}">Ruangan</a>
-              <a href="{% url 'schedule' %}"
-                class="nav-link {% if current_path == '/jadwal/' %}nav-link-active{% endif %}">Jadwal</a>
-              {% if user.is_authenticated %}
-              <a href="{% url 'my_bookings' %}"
-                class="nav-link {% if '/pesanan-saya' in current_path %}nav-link-active{% endif %}">Pesanan Saya</a>
-              <div class="h-6 w-px bg-slate-200 mx-2"></div>
-              <form action="{% url 'logout' %}" method="post" class="inline">
-                {% csrf_token %}
-                <button type="submit"
-                  class="btn btn-secondary btn-sm text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-100">
-                  Keluar
-                </button>
-              </form>
-              <a href="{% url 'booking_create' %}" class="btn btn-primary btn-sm ml-2">
-                Pesan Ruang
-              </a>
-              {% else %}
-              <div class="h-6 w-px bg-slate-200 mx-2"></div>
-              <a href="{% url 'login' %}" class="nav-link">Masuk</a>
-              <a href="{% url 'register' %}" class="btn btn-secondary btn-sm">Daftar</a>
-              <a href="{% url 'login' %}?next={% url 'booking_create' %}" class="btn btn-primary btn-sm ml-2">
-                Pesan Sekarang
-              </a>
-              {% endif %}
-              {% endif %}
-            </nav>
-
-            <button id="mobile-menu-btn"
-              class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-50 md:hidden focus:outline-none"
-              aria-label="Menu Utama">
-              <svg id="menu-icon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg id="close-icon" class="h-6 w-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-      </div>
+      <!-- Mobile Hamburger -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+        <svg id="menuIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg id="closeIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
     </div>
 
-    <div id="mobile-menu"
-      class="hidden border-t border-slate-200 bg-white/95 px-4 py-4 space-y-2 backdrop-blur-lg md:hidden">
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
       {% if user.is_staff %}
-      <a href="{% url 'admin_dashboard' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50">Dashboard</a>
-      <a href="{% url 'admin_room_list' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50">Kelola Ruangan</a>
-      <a href="{% url 'admin_booking_list' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50">Kelola Pesanan</a>
-      <a href="{% url 'admin_floor_plan' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50">Denah</a>
-      <div class="h-px bg-slate-100 my-2"></div>
-      <form action="{% url 'logout' %}" method="post" class="w-full">
-        {% csrf_token %}
-        <button type="submit" class="w-full btn btn-secondary text-rose-600 border-rose-100 hover:bg-rose-50">
-          Keluar
-        </button>
-      </form>
+        <a href="{% url 'admin_dashboard' %}" class="mobile-nav-link">Dashboard</a>
+        <a href="{% url 'admin_room_list' %}" class="mobile-nav-link">Kelola Ruangan</a>
+        <a href="{% url 'admin_booking_list' %}" class="mobile-nav-link">Kelola Pesanan</a>
+        <a href="{% url 'admin_floor_plan' %}" class="mobile-nav-link">Denah Interaktif</a>
+        <form action="{% url 'logout' %}" method="post" style="padding:12px 0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm btn-full">Keluar</button>
+        </form>
       {% else %}
-      {% if user.is_authenticated %}
-      <a href="{% url 'my_bookings' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50">Dashboard</a>
-      {% endif %}
-      <a href="{% url 'room_type_list' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50">Ruangan</a>
-      <a href="{% url 'schedule' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50">Jadwal</a>
-      {% if user.is_authenticated %}
-      <a href=\"{% url 'beranda' %}\"
-        class=\"block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50\">Dashboard</a>
-      <a href=\"{% url 'my_bookings' %}\"
-        class=\"block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50\">Pesanan Saya</a>
-      <div class="h-px bg-slate-100 my-2"></div>
-      <form action="{% url 'logout' %}" method="post" class="w-full mb-2">
-        {% csrf_token %}
-        <button type="submit" class="w-full btn btn-secondary text-rose-600 border-rose-100 hover:bg-rose-50">
-          Keluar
-        </button>
-      </form>
-      <a href="{% url 'booking_create' %}" class="block w-full btn btn-primary text-center">
-        Pesan Ruang
-      </a>
-      {% else %}
-      <div class="h-px bg-slate-100 my-2"></div>
-      <a href="{% url 'login' %}"
-        class="block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50 text-center">Masuk</a>
-      <a href="{% url 'register' %}" class="block w-full btn btn-secondary text-center">Daftar</a>
-      <a href="{% url 'login' %}?next={% url 'booking_create' %}" class="block w-full btn btn-primary text-center mt-2">
-        Pesan Sekarang
-      </a>
-      {% endif %}
+        {% if user.is_authenticated %}
+        <a href="{% url 'beranda' %}" class="mobile-nav-link">Dashboard</a>
+        {% endif %}
+        <a href="{% url 'room_type_list' %}" class="mobile-nav-link">Ruangan</a>
+        <a href="{% url 'schedule' %}" class="mobile-nav-link">Jadwal</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_bookings' %}" class="mobile-nav-link">Pesanan Saya</a>
+        <form action="{% url 'logout' %}" method="post" style="padding:12px 0 8px">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost btn-sm btn-full" style="color:var(--danger);border-color:rgba(239,68,68,0.3);">Keluar</button>
+        </form>
+        <a href="{% url 'booking_create' %}" class="btn btn-primary btn-full" style="border-radius:999px;margin-top:4px;">Pesan Ruang</a>
+        {% else %}
+        <div style="display:flex;gap:8px;padding:12px 0 4px;">
+          <a href="{% url 'login' %}" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;">Masuk</a>
+          <a href="{% url 'register' %}" class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;">Daftar</a>
+        </div>
+        <a href="{% url 'login' %}?next={% url 'booking_create' %}" class="btn btn-primary btn-full btn-pill" style="margin-top:4px;">Pesan Sekarang</a>
+        {% endif %}
       {% endif %}
     </div>
   </header>
 
+  <!-- ===================== FLASH MESSAGES ===================== -->
   {% if messages %}
-  <div class="mx-auto mt-6 w-full max-w-6xl px-4 sm:px-6 lg:px-8 space-y-2">
+  <div class="messages-container">
     {% for message in messages %}
-    <div class="rounded-2xl px-5 py-4 text-sm font-semibold shadow-sm flex items-center justify-between gap-3 animate-fade-in
-      {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/80
-      {% elif message.tags == 'error' %}bg-rose-50 text-rose-800 ring-1 ring-rose-200/80
-      {% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 ring-1 ring-amber-200/80
-      {% else %}bg-indigo-50 text-indigo-800 ring-1 ring-indigo-200/80{% endif %}">
-      <div class="flex items-center gap-2">
-        {% if message.tags == 'success' %}
-        <svg class="h-5 w-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {% elif message.tags == 'error' %}
-        <svg class="h-5 w-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {% else %}
-        <svg class="h-5 w-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {% endif %}
-        <span>{{ message }}</span>
-      </div>
-      <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 focus:outline-none">
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+    <div class="message-item {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}">
+      <span>{{ message }}</span>
+      <button class="message-close" onclick="this.parentElement.remove()" aria-label="Tutup">✕</button>
     </div>
     {% endfor %}
   </div>
   {% endif %}
 
-  <main class="flex-1 flex flex-col">
+  <!-- ===================== MAIN ===================== -->
+  <main>
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="mt-auto border-t border-slate-200/60 bg-slate-900 pt-16 pb-12 text-slate-400">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 mb-12">
-        <div class="space-y-4">
-          <p class="font-heading text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-white shadow-md">
-              🎤
-            </span>
-            Melody<span class="text-indigo-400">Room</span>
-          </p>
-          <p class="text-sm leading-relaxed">
-            Sistem Informasi & Reservasi Penyewaan Ruang Karaoke Premium berbasis waktu. Nikmati kenyamanan bernyanyi
-            dengan fasilitas modern terbaik.
-          </p>
-        </div>
-        <div class="space-y-4">
-          <h4 class="text-sm font-semibold uppercase tracking-wider text-white">Menu Cepat</h4>
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <a href="{% url 'landing' %}" class="hover:text-indigo-400 transition">Beranda</a>
-            <a href="{% url 'room_type_list' %}" class="hover:text-indigo-400 transition">Ruangan</a>
-            <a href="{% url 'schedule' %}" class="hover:text-indigo-400 transition">Jadwal</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'my_bookings' %}" class="hover:text-indigo-400 transition">Pesanan Saya</a>
-            {% else %}
-            <a href="{% url 'login' %}" class="hover:text-indigo-400 transition">Masuk</a>
-            {% endif %}
-          </div>
-        </div>
-        <div class="space-y-4">
-          <h4 class="text-sm font-semibold uppercase tracking-wider text-white">Hubungi Kami</h4>
-          <p class="text-sm">
-            Jl. Musik Harmoni No. 45, Kota Melody<br>
-            Email: info@melodyroom.com<br>
-            Telp: (021) 555-1234
-          </p>
-        </div>
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <a href="{% url 'landing' %}" class="footer-logo">
+          <span class="logo-icon" style="width:32px;height:32px;font-size:0.85rem;">🎵</span>
+          <span><span class="logo-melody">Melody</span><span class="logo-room">Room</span></span>
+        </a>
+        <p>Sistem reservasi ruang karaoke premium berbasis waktu. Nikmati pengalaman bernyanyi yang tak terlupakan.</p>
       </div>
-      <div class="border-t border-slate-800 pt-8 text-center text-xs">
-        <p>&copy; {% now "Y" %} MelodyRoom. Hak Cipta Dilindungi Undang-Undang.</p>
+      <div>
+        <p class="footer-heading">Menu</p>
+        <a href="{% url 'landing' %}" class="footer-link">Beranda</a>
+        <a href="{% url 'room_type_list' %}" class="footer-link">Ruangan</a>
+        <a href="{% url 'schedule' %}" class="footer-link">Jadwal</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_bookings' %}" class="footer-link">Pesanan Saya</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="footer-link">Masuk</a>
+        {% endif %}
       </div>
+      <div>
+        <p class="footer-heading">Kontak</p>
+        <p>Jl. Musik Harmoni No. 45<br>Kota Melody<br><br>info@melodyroom.com<br>(021) 555-1234</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; {% now "Y" %} MelodyRoom. Hak Cipta Dilindungi.
     </div>
   </footer>
 
   <script>
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const menuIcon = document.getElementById('menu-icon');
-    const closeIcon = document.getElementById('close-icon');
-
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
     if (menuBtn && mobileMenu) {
       menuBtn.addEventListener('click', () => {
-        const isHidden = mobileMenu.classList.toggle('hidden');
-        if (menuIcon && closeIcon) {
-          menuIcon.classList.toggle('hidden', !isHidden);
-          closeIcon.classList.toggle('hidden', isHidden);
-        }
+        mobileMenu.classList.toggle('open');
+        const isOpen = mobileMenu.classList.contains('open');
+        if (menuIcon) menuIcon.style.display = isOpen ? 'none' : 'block';
+        if (closeIcon) closeIcon.style.display = isOpen ? 'block' : 'none';
       });
     }
   </script>
   {% block extra_js %}{% endblock %}
 </body>
-
 </html>

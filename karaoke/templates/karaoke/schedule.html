@@ -2,107 +2,229 @@
 
 {% block title %}Jadwal Ketersediaan — MelodyRoom{% endblock %}
 
+{% block extra_head %}
+<style>
+  .schedule-page { background: var(--bg-dark); flex: 1; }
+
+  .schedule-hero {
+    position: relative; overflow: hidden;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 52px 0 48px; text-align: center;
+  }
+  .schedule-hero-blob {
+    position: absolute; top: -60px; right: -60px;
+    width: 350px; height: 350px; border-radius: 50%;
+    background: radial-gradient(circle, var(--primary), transparent 65%);
+    opacity: 0.1; filter: blur(60px); pointer-events: none;
+  }
+  .schedule-hero h1 {
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 800; letter-spacing: -0.04em;
+    color: var(--text-primary); margin-bottom: 8px;
+    position: relative; z-index: 1;
+  }
+  .schedule-hero p {
+    font-size: 0.9rem; color: var(--text-muted);
+    max-width: 480px; margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  .schedule-content {
+    max-width: 1200px; margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+
+  /* Filter Bar */
+  .filter-bar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex; flex-wrap: wrap;
+    align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .filter-form {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .filter-label {
+    font-size: 0.8rem; font-weight: 700;
+    color: var(--text-secondary); white-space: nowrap;
+  }
+  .legend-row {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .legend-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; font-weight: 700;
+    padding: 5px 12px; border-radius: 999px;
+  }
+  .legend-pill.free {
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: #6EE7B7;
+  }
+  .legend-pill.pending {
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.25);
+    color: #FCD34D;
+  }
+  .legend-pill.taken {
+    background: var(--danger-glow);
+    border: 1px solid rgba(239,68,68,0.25);
+    color: #FCA5A5;
+  }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* Schedule Table */
+  .schedule-table-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .schedule-table-scroll { overflow-x: auto; }
+  .schedule-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.83rem; min-width: 780px;
+  }
+  .schedule-table thead tr {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-elevated);
+  }
+  .schedule-table thead th {
+    padding: 13px 10px;
+    font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); text-align: center; white-space: nowrap;
+  }
+  .schedule-table thead th:first-child {
+    text-align: left; padding-left: 20px;
+    position: sticky; left: 0; z-index: 2;
+    background: var(--bg-elevated);
+    border-right: 1px solid var(--border);
+  }
+  .schedule-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .schedule-table tbody tr:last-child { border-bottom: none; }
+  .schedule-table tbody tr:hover { background: var(--bg-elevated); }
+  .schedule-table tbody td {
+    padding: 8px 6px; text-align: center;
+  }
+  .schedule-table tbody td:first-child {
+    padding: 12px 20px; text-align: left;
+    position: sticky; left: 0; z-index: 1;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    min-width: 120px;
+  }
+  .schedule-table tbody tr:hover td:first-child { background: var(--bg-elevated); }
+  .room-cell-code {
+    font-size: 0.875rem; font-weight: 800; color: var(--text-primary);
+  }
+  .room-cell-name { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+
+  .slot {
+    height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700;
+    transition: transform 0.15s;
+    margin: 0 2px;
+    cursor: default;
+  }
+  .slot:hover { transform: scale(1.08); }
+  .slot-free {
+    background: rgba(16,185,129,0.12);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: #6EE7B7;
+  }
+  .slot-pending {
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.25);
+    color: #FCD34D;
+  }
+  .slot-taken {
+    background: var(--danger-glow);
+    border: 1px solid rgba(239,68,68,0.25);
+    color: #FCA5A5;
+  }
+
+  /* CTA */
+  .schedule-cta {
+    text-align: center; margin-top: 40px;
+    padding: 32px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 14px;
+  }
+  .schedule-cta p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px; }
+
+  /* Empty */
+  .empty-state {
+    text-align: center; background: var(--bg-card);
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 14px; padding: 60px 32px;
+  }
+  .empty-emoji { font-size: 2.5rem; margin-bottom: 14px; display: block; }
+  .empty-state h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+  .empty-state p { font-size: 0.85rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- HEADER HERO -->
-<section class="relative bg-slate-900 py-16 text-white overflow-hidden">
-  <div class="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-overlay"
-    style="background-image: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1200');">
+<div class="schedule-page">
+  <div class="schedule-hero">
+    <div class="schedule-hero-blob"></div>
+    <div class="section-container" style="position:relative;z-index:1;">
+      <span class="section-label">Ketersediaan Real-Time</span>
+      <h1>Jadwal Ruangan</h1>
+      <p>Lihat slot waktu yang tersedia untuk tanggal yang Anda pilih.</p>
+    </div>
   </div>
-  <div class="relative mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
-    <h1 class="font-heading text-4xl font-extrabold tracking-tight">Jadwal Ketersediaan Ruangan</h1>
-    <p class="mx-auto mt-3 max-w-xl text-lg text-slate-300">
-      Lihat jam berapa saja ruangan kami yang kosong dan terisi untuk tanggal yang dipilih.
-    </p>
-  </div>
-</section>
 
-<!-- MAIN SCHEDULE CONTENT -->
-<section class="py-12 flex-1 bg-slate-50">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-
-    <!-- Filter Date Card -->
-    <div
-      class="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-      <form method="get" class="flex flex-wrap items-center gap-4 w-full sm:w-auto">
-        <div class="flex items-center gap-2">
-          <span class="text-sm font-semibold text-slate-700">Tanggal Reservasi:</span>
-          <input type="date" name="date" id="date" value="{{ booking_date|date:'Y-m-d' }}"
-            class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-800 shadow-inner outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition">
-        </div>
-        <button type="submit" class="btn btn-primary btn-sm px-5 py-2 font-bold">
-          Tampilkan
-        </button>
+  <div class="schedule-content">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <form method="get" class="filter-form">
+        <span class="filter-label">Tanggal:</span>
+        <input type="date" name="date" id="date" value="{{ booking_date|date:'Y-m-d' }}"
+               class="form-control" style="width:auto;padding:9px 14px;font-size:0.85rem;">
+        <button type="submit" class="btn btn-primary btn-sm btn-pill">Tampilkan</button>
       </form>
-
-      <!-- Legends -->
-      <div class="flex flex-wrap gap-4 text-xs font-semibold">
-        <span
-          class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full ring-1 ring-emerald-200/80">
-          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-          ✓ Kosong
-        </span>
-        <span
-          class="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full ring-1 ring-amber-200/80">
-          <span class="h-2 w-2 rounded-full bg-amber-500"></span>
-          ⏳ Pending
-        </span>
-        <span
-          class="flex items-center gap-1.5 text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full ring-1 ring-rose-200/80">
-          <span class="h-2 w-2 rounded-full bg-rose-500"></span>
-          ✗ Terisi
-        </span>
+      <div class="legend-row">
+        <span class="legend-pill free"><span class="legend-dot" style="background:#10B981"></span>Kosong</span>
+        <span class="legend-pill pending"><span class="legend-dot" style="background:#F59E0B;animation:pulse-dot 2s infinite"></span>Pending</span>
+        <span class="legend-pill taken"><span class="legend-dot" style="background:var(--danger)"></span>Terisi</span>
       </div>
     </div>
 
-    <!-- Schedule Grid Table -->
+    <!-- Schedule Table -->
     {% if schedule_rows %}
-    <div class="rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-sm min-w-[800px]">
+    <div class="schedule-table-wrap">
+      <div class="schedule-table-scroll">
+        <table class="schedule-table">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th
-                class="px-6 py-4 font-bold text-slate-700 text-xs uppercase tracking-wider sticky left-0 bg-slate-50 z-10 border-r border-slate-200/80">
-                Ruangan
-              </th>
+            <tr>
+              <th>Ruangan</th>
               {% for h in operating_hours %}
-              <th
-                class="px-4 py-4 font-bold text-slate-700 text-center text-xs uppercase tracking-wider border-r border-slate-100 last:border-0">
-                {{ h }}:00
-              </th>
+              <th>{{ h }}:00</th>
               {% endfor %}
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody>
             {% for row in schedule_rows %}
-            <tr class="hover:bg-slate-50/50 transition">
-              <!-- Room Identifier Sticky Column -->
-              <td
-                class="px-6 py-4 font-bold text-slate-900 sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-200/80">
-                <div>{{ row.room.room_code }}</div>
-                <span class="text-[11px] font-medium text-slate-400 block mt-0.5">{{ row.room.name }}</span>
+            <tr>
+              <td>
+                <div class="room-cell-code">{{ row.room.room_code }}</div>
+                <div class="room-cell-name">{{ row.room.name }}</div>
               </td>
-              <!-- Hourly Slots -->
               {% for hour, status in row.slots %}
-              <td class="p-2 border-r border-slate-100 last:border-0 text-center">
+              <td>
                 {% if status == 'free' %}
-                <div
-                  class="h-9 w-full rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold ring-1 ring-emerald-200/40"
-                  title="Kosong">
-                  ✓
-                </div>
+                <div class="slot slot-free" title="{{ hour }}:00 — Tersedia">✓</div>
                 {% elif status == 'pending' %}
-                <div
-                  class="h-9 w-full rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold ring-1 ring-amber-200/40 animate-pulse"
-                  title="Pending">
-                  ⏳
-                </div>
+                <div class="slot slot-pending" title="{{ hour }}:00 — Pending">⏳</div>
                 {% else %}
-                <div
-                  class="h-9 w-full rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold ring-1 ring-rose-200/40"
-                  title="Terisi">
-                  ✗
-                </div>
+                <div class="slot slot-taken" title="{{ hour }}:00 — Terisi">✗</div>
                 {% endif %}
               </td>
               {% endfor %}
@@ -113,31 +235,27 @@
       </div>
     </div>
     {% else %}
-    <div class="text-center rounded-2xl bg-white border border-dashed border-slate-200 p-16 shadow-sm">
-      <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-3xl mb-4">
-        📅
-      </div>
-      <h3 class="font-heading text-lg font-bold text-slate-800">Ruangan Tidak Tersedia</h3>
-      <p class="text-sm text-slate-500 mt-1">Belum ada unit ruangan yang didaftarkan untuk jadwal saat ini.</p>
+    <div class="empty-state">
+      <span class="empty-emoji">📅</span>
+      <h3>Belum Ada Data Ruangan</h3>
+      <p>Belum ada unit ruangan yang didaftarkan untuk jadwal saat ini.</p>
     </div>
     {% endif %}
 
-    <!-- Booking Redirect CTA -->
     {% if not user.is_staff %}
-    <div class="text-center mt-12">
-      <p class="text-slate-500 text-sm mb-4">Sudah menemukan jam dan ruangan yang tepat?</p>
+    <div class="schedule-cta">
+      <p>Sudah menemukan jam dan ruangan yang tepat?</p>
       {% if user.is_authenticated %}
-      <a href="{% url 'booking_create' %}" class="btn btn-primary px-8 py-3.5 shadow-lg">
+      <a href="{% url 'booking_create' %}" class="btn btn-primary btn-pill" style="padding:12px 32px;">
         Pesan Ruangan Sekarang
       </a>
       {% else %}
-      <a href="{% url 'login' %}?next={% url 'booking_create' %}" class="btn btn-primary px-8 py-3.5 shadow-lg">
+      <a href="{% url 'login' %}?next={% url 'booking_create' %}" class="btn btn-primary btn-pill" style="padding:12px 32px;">
         Login untuk Pesan Sekarang
       </a>
       {% endif %}
     </div>
     {% endif %}
-
   </div>
-</section>
+</div>
 {% endblock %}

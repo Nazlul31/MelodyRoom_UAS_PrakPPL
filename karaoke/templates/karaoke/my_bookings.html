@@ -1,89 +1,165 @@
 {% extends 'karaoke/base.html' %}
 
-{% block title %}Riwayat Pesanan Saya — MelodyRoom{% endblock %}
+{% block title %}Riwayat Pesanan — MelodyRoom{% endblock %}
+
+{% block extra_head %}
+<style>
+  .mybookings-page { background: var(--bg-dark); flex: 1; }
+
+  .mybookings-hero {
+    position: relative; overflow: hidden;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 44px 0 40px;
+  }
+  .mybookings-hero-blob {
+    position: absolute; top: -60px; right: -60px;
+    width: 320px; height: 320px; border-radius: 50%;
+    background: radial-gradient(circle, var(--primary), transparent 65%);
+    opacity: 0.1; filter: blur(60px); pointer-events: none;
+  }
+  .mybookings-hero-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    position: relative; z-index: 1;
+    display: flex; flex-wrap: wrap;
+    align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .mybookings-hero h1 {
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-weight: 800; letter-spacing: -0.04em;
+    color: var(--text-primary); margin-bottom: 4px;
+  }
+  .mybookings-hero p { font-size: 0.85rem; color: var(--text-muted); }
+
+  .mybookings-content {
+    max-width: 1200px; margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+
+  /* Timeline card list */
+  .booking-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .bk-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    display: flex; align-items: stretch;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bk-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+
+  .bk-accent {
+    width: 4px; flex-shrink: 0;
+  }
+  .bk-accent.lunas  { background: var(--success); }
+  .bk-accent.pending { background: var(--warning); }
+  .bk-accent.batal  { background: var(--danger); }
+
+  .bk-body {
+    flex: 1; padding: 16px 20px;
+    display: flex; flex-wrap: wrap;
+    align-items: center; gap: 12px;
+    min-width: 0;
+  }
+  .bk-id {
+    font-size: 0.72rem; font-weight: 700;
+    color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.06em; white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .bk-room {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--primary-glow);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 6px; padding: 3px 9px;
+    font-size: 0.78rem; font-weight: 800;
+    color: var(--primary-light); flex-shrink: 0;
+  }
+  .bk-info { flex: 1; min-width: 180px; }
+  .bk-pkg {
+    font-size: 0.9rem; font-weight: 700;
+    color: var(--text-primary); margin-bottom: 3px;
+  }
+  .bk-meta {
+    font-size: 0.78rem; color: var(--text-muted);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .bk-right {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 6px; flex-shrink: 0;
+  }
+  .bk-price {
+    font-size: 1rem; font-weight: 800; color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center; background: var(--bg-card);
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 14px; padding: 64px 32px;
+  }
+  .empty-emoji { font-size: 2.8rem; display: block; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+  .empty-state p { font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin: 0 auto 24px; line-height: 1.6; }
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- HEADER HERO -->
-<section class="relative bg-slate-900 py-12 text-white overflow-hidden">
-  <div class="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay"
-    style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1200');">
-  </div>
-  <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+<div class="mybookings-page">
+  <div class="mybookings-hero">
+    <div class="mybookings-hero-blob"></div>
+    <div class="mybookings-hero-inner">
       <div>
-        <h1 class="font-heading text-3xl font-extrabold tracking-tight">Riwayat Pesanan Saya</h1>
-        <p class="mt-1 text-slate-350 text-sm">
-          Daftar seluruh reservasi ruang karaoke yang pernah Anda buat.
-        </p>
+        <h1>Riwayat Pesanan Saya</h1>
+        <p>Seluruh reservasi ruang karaoke yang pernah Anda buat.</p>
       </div>
-      <a href="{% url 'booking_create' %}" class="btn btn-primary shadow-lg self-start sm:self-auto">
+      <a href="{% url 'booking_create' %}" class="btn btn-primary btn-pill">
         + Buat Pesanan Baru
       </a>
     </div>
   </div>
-</section>
 
-<!-- MAIN TABLE -->
-<section class="py-12 flex-1 bg-slate-50">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+  <div class="mybookings-content">
     {% if bookings %}
-    <div class="rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-sm">
-          <thead>
-            <tr
-              class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              <th class="px-6 py-4">ID Booking</th>
-              <th class="px-6 py-4">Kode/Unit</th>
-              <th class="px-6 py-4">Paket Sewa</th>
-              <th class="px-6 py-4">Tanggal Main</th>
-              <th class="px-6 py-4">Jam Sewa</th>
-              <th class="px-6 py-4">Total Biaya</th>
-              <th class="px-6 py-4">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 text-slate-700">
-            {% for b in bookings %}
-            <tr class="hover:bg-slate-50/50 transition">
-              <td class="px-6 py-4 font-bold text-slate-900">#{{ b.id }}</td>
-              <td class="px-6 py-4">
-                <span class="font-bold text-indigo-600 block">{{ b.room.room_code }}</span>
-                <span class="text-[11px] text-slate-400 font-medium block">{{ b.room.room_type.name }}</span>
-              </td>
-              <td class="px-6 py-4 font-medium text-slate-800">{{ b.package.name }}</td>
-              <td class="px-6 py-4">{{ b.booking_date|date:"d M Y" }}</td>
-              <td class="px-6 py-4 text-slate-655 font-medium">
-                {{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }} <span
-                  class="text-xs text-slate-400">WIB</span>
-              </td>
-              <td class="px-6 py-4 font-extrabold text-slate-900">Rp {{ b.total_price|floatformat:0 }}</td>
-              <td class="px-6 py-4">
-                <span class="badge
-                  {% if b.status == 'LUNAS' %}badge-lunas
-                  {% elif b.status == 'PENDING' %}badge-pending
-                  {% else %}badge-batal{% endif %}">
-                  {{ b.get_status_display }}
-                </span>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <div class="booking-list">
+      {% for b in bookings %}
+      <div class="bk-card">
+        <div class="bk-accent {% if b.status == 'LUNAS' %}lunas{% elif b.status == 'PENDING' %}pending{% else %}batal{% endif %}"></div>
+        <div class="bk-body">
+          <span class="bk-id">#{{ b.id }}</span>
+          <span class="bk-room">{{ b.room.room_code }}</span>
+          <div class="bk-info">
+            <div class="bk-pkg">Paket {{ b.package.name }}</div>
+            <div class="bk-meta">
+              <span>📅 {{ b.booking_date|date:"d M Y" }}</span>
+              <span>·</span>
+              <span>⏱ {{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }} WIB</span>
+              <span>·</span>
+              <span style="color:var(--text-secondary)">{{ b.room.room_type.name }}</span>
+            </div>
+          </div>
+          <div class="bk-right">
+            <div class="bk-price">Rp {{ b.total_price|floatformat:0 }}</div>
+            <span class="badge {% if b.status == 'LUNAS' %}badge-lunas{% elif b.status == 'PENDING' %}badge-pending{% else %}badge-batal{% endif %}">
+              {{ b.get_status_display }}
+            </span>
+          </div>
+        </div>
       </div>
+      {% endfor %}
     </div>
     {% else %}
-    <div class="text-center rounded-2xl bg-white border border-dashed border-slate-200 p-16 shadow-sm">
-      <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-3xl mb-4">
-        🗒️
-      </div>
-      <h3 class="font-heading text-lg font-bold text-slate-800">Belum Ada Pesanan</h3>
-      <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">Anda belum pernah melakukan pemesanan ruangan. Buat
-        pemesanan pertama Anda sekarang!</p>
-      <a href="{% url 'booking_create' %}" class="btn btn-primary mt-6">
-        Pesan Ruangan Pertama
-      </a>
+    <div class="empty-state">
+      <span class="empty-emoji">🗒️</span>
+      <h3>Belum Ada Pesanan</h3>
+      <p>Anda belum pernah melakukan pemesanan ruangan. Buat pesanan pertama Anda sekarang!</p>
+      <a href="{% url 'booking_create' %}" class="btn btn-primary btn-pill">Pesan Ruangan Pertama</a>
     </div>
     {% endif %}
   </div>
-</section>
+</div>
 {% endblock %}
