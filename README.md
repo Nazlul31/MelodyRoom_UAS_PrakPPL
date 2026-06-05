@@ -150,27 +150,8 @@ Akses di browser: **http://127.0.0.1:8000**
 
 ---
 
-## Management Commands
-
-```bash
-# Seed paket sewa default (1, 2, 3 jam)
-python manage.py seed_packages
-
-# Seed data demo lengkap (ruangan, tipe, fasilitas)
-python manage.py seed_demo
-
-# Reset seluruh data
-python manage.py reset_data
-
-# Reassign posisi grid denah ruangan
-python manage.py reassign_grid
-```
-
----
-
 ## Catatan
 
 - Jam operasional: **17:00 – 02:00** (cross-midnight didukung)
 - Booking yang melewati tengah malam ditangani secara otomatis di validasi form dan denah real-time
 - Gambar ruangan bisa diupload melalui form admin; jika tidak ada, akan menggunakan gambar fallback
-- Foto section About di landing page disimpan di `static/images/about.jpg`
