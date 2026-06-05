@@ -135,16 +135,14 @@
               </form>
               {% else %}
               {% if user.is_authenticated %}
-              <a href="{% url 'my_bookings' %}"
-                class="nav-link {% if current_path == '/pesanan-saya' %}nav-link-active{% endif %}">Dashboard</a>
+              <a href="{% url 'beranda' %}"
+                class="nav-link {% if current_path == '/beranda/' %}nav-link-active{% endif %}">Dashboard</a>
               {% endif %}
               <a href="{% url 'room_type_list' %}"
                 class="nav-link {% if current_path == '/ruangan/' or '/ruangan/' in current_path %}nav-link-active{% endif %}">Ruangan</a>
               <a href="{% url 'schedule' %}"
                 class="nav-link {% if current_path == '/jadwal/' %}nav-link-active{% endif %}">Jadwal</a>
               {% if user.is_authenticated %}
-              <a href="{% url 'beranda' %}"
-                class="nav-link {% if current_path == '/beranda/' %}nav-link-active{% endif %}">Dashboard</a>
               <a href="{% url 'my_bookings' %}"
                 class="nav-link {% if '/pesanan-saya' in current_path %}nav-link-active{% endif %}">Pesanan Saya</a>
               <div class="h-6 w-px bg-slate-200 mx-2"></div>
