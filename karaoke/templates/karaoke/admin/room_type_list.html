@@ -1,0 +1,69 @@
+{% extends 'karaoke/admin/base_admin.html' %}
+
+{% block title %}Tipe Ruangan — MelodyRoom Admin{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+  <!-- Header Title -->
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-heading text-3xl font-extrabold text-slate-900">Tipe Ruangan</h1>
+      <p class="text-sm text-slate-500 mt-1">Buat tipe kategori ruangan terlebih dahulu sebelum menambah unit ruangan fisik.</p>
+    </div>
+    <a href="{% url 'admin_room_type_create' %}" class="btn btn-primary shadow-lg shadow-indigo-500/15">
+      + Tambah Tipe Ruangan
+    </a>
+  </div>
+
+  <!-- Table Card -->
+  {% if room_types %}
+  <div class="rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-sm">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <th class="px-6 py-4">Nama Tipe</th>
+            <th class="px-6 py-4">Kapasitas Maks.</th>
+            <th class="px-6 py-4">Harga Sewa / Jam</th>
+            <th class="px-6 py-4">Status Tipe</th>
+            <th class="px-6 py-4">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700">
+          {% for rt in room_types %}
+          <tr class="hover:bg-slate-50/50 transition">
+            <td class="px-6 py-4 font-bold text-slate-900">{{ rt.name }}</td>
+            <td class="px-6 py-4 font-semibold text-slate-600">👤 {{ rt.capacity }} orang</td>
+            <td class="px-6 py-4 font-extrabold text-indigo-600">Rp {{ rt.price_per_hour|floatformat:0 }}</td>
+            <td class="px-6 py-4">
+              {% if rt.is_active %}
+                <span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-250">Aktif</span>
+              {% else %}
+                <span class="inline-flex rounded-full bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-500 ring-1 ring-slate-200">Nonaktif</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4">
+              <a href="{% url 'admin_room_type_edit' rt.pk %}" class="btn btn-secondary btn-sm border-indigo-100 hover:bg-indigo-50/50 hover:text-indigo-650 font-bold transition">
+                ✏️ Edit
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center rounded-2xl bg-white border border-dashed border-slate-200 p-16 shadow-sm">
+    <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-3xl mb-4">
+      ✨
+    </div>
+    <h3 class="font-heading text-lg font-bold text-slate-800">Belum Ada Tipe Ruangan</h3>
+    <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto mb-6">Anda harus membuat minimal satu tipe ruangan kategori sebelum dapat mendaftarkan unit ruangan karaoke.</p>
+    <a href="{% url 'admin_room_type_create' %}" class="btn btn-primary">
+      Buat Tipe Ruangan Pertama
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

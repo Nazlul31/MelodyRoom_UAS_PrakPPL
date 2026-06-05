@@ -1,0 +1,35 @@
+{% extends 'karaoke/admin/base_admin.html' %}
+
+{% block title %}Konfirmasi Hapus Ruangan — MelodyRoom Admin{% endblock %}
+
+{% block admin_content %}
+<div class="mx-auto max-w-md py-8">
+  <div class="overflow-hidden rounded-2xl border border-rose-100 bg-white shadow-xl">
+    <!-- Header alert -->
+    <div class="bg-rose-50 px-6 py-6 text-center text-rose-800 border-b border-rose-150">
+      <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-2xl mb-2">
+        ⚠️
+      </div>
+      <h1 class="font-heading text-xl font-extrabold">Hapus Ruangan?</h1>
+      <p class="text-xs text-rose-700 mt-1">Tindakan ini tidak dapat dibatalkan!</p>
+    </div>
+
+    <!-- Details and Form -->
+    <div class="p-6 sm:p-8 space-y-6">
+      <p class="text-sm text-slate-500 text-center leading-relaxed">
+        Apakah Anda yakin ingin menghapus ruangan fisik <strong class="text-slate-800">{{ room.room_code }} — {{ room.name }}</strong> dari database MelodyRoom?
+      </p>
+
+      <form method="post" class="flex gap-3">
+        {% csrf_token %}
+        <button type="submit" class="flex-1 btn btn-danger py-3">
+          Ya, Hapus Ruangan
+        </button>
+        <a href="{% url 'admin_room_list' %}" class="flex-1 btn btn-secondary py-3 text-center">
+          Batal
+        </a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

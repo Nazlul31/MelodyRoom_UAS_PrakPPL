@@ -1,0 +1,89 @@
+{% extends 'karaoke/base.html' %}
+
+{% block title %}Riwayat Pesanan Saya — MelodyRoom{% endblock %}
+
+{% block content %}
+<!-- HEADER HERO -->
+<section class="relative bg-slate-900 py-12 text-white overflow-hidden">
+  <div class="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay"
+    style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1200');">
+  </div>
+  <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+      <div>
+        <h1 class="font-heading text-3xl font-extrabold tracking-tight">Riwayat Pesanan Saya</h1>
+        <p class="mt-1 text-slate-350 text-sm">
+          Daftar seluruh reservasi ruang karaoke yang pernah Anda buat.
+        </p>
+      </div>
+      <a href="{% url 'booking_create' %}" class="btn btn-primary shadow-lg self-start sm:self-auto">
+        + Buat Pesanan Baru
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN TABLE -->
+<section class="py-12 flex-1 bg-slate-50">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    {% if bookings %}
+    <div class="rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr
+              class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <th class="px-6 py-4">ID Booking</th>
+              <th class="px-6 py-4">Kode/Unit</th>
+              <th class="px-6 py-4">Paket Sewa</th>
+              <th class="px-6 py-4">Tanggal Main</th>
+              <th class="px-6 py-4">Jam Sewa</th>
+              <th class="px-6 py-4">Total Biaya</th>
+              <th class="px-6 py-4">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700">
+            {% for b in bookings %}
+            <tr class="hover:bg-slate-50/50 transition">
+              <td class="px-6 py-4 font-bold text-slate-900">#{{ b.id }}</td>
+              <td class="px-6 py-4">
+                <span class="font-bold text-indigo-600 block">{{ b.room.room_code }}</span>
+                <span class="text-[11px] text-slate-400 font-medium block">{{ b.room.room_type.name }}</span>
+              </td>
+              <td class="px-6 py-4 font-medium text-slate-800">{{ b.package.name }}</td>
+              <td class="px-6 py-4">{{ b.booking_date|date:"d M Y" }}</td>
+              <td class="px-6 py-4 text-slate-655 font-medium">
+                {{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }} <span
+                  class="text-xs text-slate-400">WIB</span>
+              </td>
+              <td class="px-6 py-4 font-extrabold text-slate-900">Rp {{ b.total_price|floatformat:0 }}</td>
+              <td class="px-6 py-4">
+                <span class="badge
+                  {% if b.status == 'LUNAS' %}badge-lunas
+                  {% elif b.status == 'PENDING' %}badge-pending
+                  {% else %}badge-batal{% endif %}">
+                  {{ b.get_status_display }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center rounded-2xl bg-white border border-dashed border-slate-200 p-16 shadow-sm">
+      <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-3xl mb-4">
+        🗒️
+      </div>
+      <h3 class="font-heading text-lg font-bold text-slate-800">Belum Ada Pesanan</h3>
+      <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">Anda belum pernah melakukan pemesanan ruangan. Buat
+        pemesanan pertama Anda sekarang!</p>
+      <a href="{% url 'booking_create' %}" class="btn btn-primary mt-6">
+        Pesan Ruangan Pertama
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

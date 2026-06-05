@@ -1,0 +1,261 @@
+{% extends 'karaoke/admin/base_admin.html' %}
+
+{% block title %}Denah Ruangan — MelodyRoom Admin{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+  <!-- Header Title -->
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-heading text-3xl font-extrabold text-slate-900">Denah Ruangan Interaktif</h1>
+      <p class="text-sm text-slate-500 mt-1">Status ruangan saat ini</p>
+    </div>
+
+    <!-- Legend status -->
+    <div class="flex flex-wrap gap-4 text-xs font-bold">
+      <span
+        class="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100">
+        <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+        Tersedia
+      </span>
+      <span class="flex items-center gap-1.5 text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100">
+        <span class="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+        Pending
+      </span>
+      <span class="flex items-center gap-1.5 text-rose-800 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-100">
+        <span class="h-2.5 w-2.5 rounded-full bg-rose-500 animate-ping"></span>
+        Terpakai
+      </span>
+    </div>
+  </div>
+
+  <!-- Interactive Grid Map -->
+  {% if room_data %}
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {% for item in room_data %}
+    {% if item.occupied %}
+    <!-- OCCUPIED STATE (RED) -->
+    <div onclick="toggleModal('modal-{{ item.room.pk }}')"
+      class="group relative flex flex-col justify-between rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 p-6 text-white shadow-md hover:shadow-xl hover:shadow-rose-500/10 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+      <!-- Background glow pulse -->
+      <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-xl group-hover:scale-125 transition">
+      </div>
+
+      <div class="flex justify-between items-start">
+        <span class="font-heading text-2xl font-extrabold tracking-tight">{{ item.room.room_code }}</span>
+        <span class="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+          Terpakai
+        </span>
+      </div>
+
+      <div class="mt-8 space-y-1">
+        <h4 class="font-bold text-sm line-clamp-1 opacity-90">{{ item.room.name }}</h4>
+        <p class="text-xs text-rose-100 flex items-center gap-1">
+          👤 {{ item.active_booking.user.username }}
+        </p>
+        {% if item.remaining %}
+        <p class="text-xs font-extrabold bg-white/25 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg mt-2">
+          ⏱️ Sisa: {{ item.remaining }}
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-white/25 flex items-center justify-between text-xs text-rose-100">
+        <span>{{ item.active_booking.start_time|time:"H:i" }} - {{ item.active_booking.end_time|time:"H:i" }}</span>
+        <span class="underline group-hover:text-white font-semibold transition">Klik detail</span>
+      </div>
+    </div>
+
+    {% elif item.pending_booking %}
+    <!-- PENDING STATE (YELLOW) -->
+    <div onclick="toggleModal('modal-{{ item.room.pk }}')"
+      class="group relative flex flex-col justify-between rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 p-6 text-white shadow-md hover:shadow-xl hover:shadow-amber-500/10 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+      <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-xl group-hover:scale-125 transition">
+      </div>
+
+      <div class="flex justify-between items-start">
+        <span class="font-heading text-2xl font-extrabold tracking-tight">{{ item.room.room_code }}</span>
+        <span class="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider animate-pulse">
+          Pending
+        </span>
+      </div>
+
+      <div class="mt-8 space-y-1">
+        <h4 class="font-bold text-sm line-clamp-1 opacity-90">{{ item.room.name }}</h4>
+        <p class="text-xs text-amber-100 flex items-center gap-1">
+          👤 {{ item.pending_booking.user.username }}
+        </p>
+        <p
+          class="text-xs font-semibold bg-white/20 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg mt-2 text-white">
+          Menunggu Pembayaran
+        </p>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-white/20 flex items-center justify-between text-xs text-amber-100">
+        <span>{{ item.pending_booking.start_time|time:"H:i" }} - {{ item.pending_booking.end_time|time:"H:i" }}</span>
+        <span class="underline group-hover:text-white font-semibold transition">Konfirmasi</span>
+      </div>
+    </div>
+
+    {% else %}
+    <!-- VACANT STATE (GREEN) -->
+    <div onclick="toggleModal('modal-{{ item.room.pk }}')"
+      class="group relative flex flex-col justify-between rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 text-white shadow-md hover:shadow-xl hover:shadow-emerald-500/10 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+      <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-xl group-hover:scale-125 transition">
+      </div>
+
+      <div class="flex justify-between items-start">
+        <span class="font-heading text-2xl font-extrabold tracking-tight">{{ item.room.room_code }}</span>
+        <span class="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+          Kosong
+        </span>
+      </div>
+
+      <div class="mt-8 space-y-1">
+        <h4 class="font-bold text-sm line-clamp-1 opacity-90">{{ item.room.name }}</h4>
+        <p class="text-xs text-emerald-100">👤 Kapasitas: {{ item.room.capacity }} orang</p>
+        <p class="text-xs text-emerald-100 font-semibold mt-1">Rp {{ item.room.price_per_hour|floatformat:0 }} / jam</p>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-white/20 flex items-center justify-between text-xs text-emerald-100">
+        <span>Tipe: {{ item.room.room_type.name }}</span>
+        <span class="underline group-hover:text-white font-semibold transition">Lihat Unit</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- MODALS FOR QUICK ACTIONS -->
+    <div id="modal-{{ item.room.pk }}"
+      class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div
+        class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform scale-95 transition-all duration-300">
+
+        <!-- Modal Header -->
+        <div class="px-6 py-5 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+          <div>
+            <h3 class="font-heading text-lg font-bold text-slate-800">Ruangan {{ item.room.room_code }}</h3>
+            <p class="text-xs text-slate-500">{{ item.room.room_type.name }}</p>
+          </div>
+          <button onclick="toggleModal('modal-{{ item.room.pk }}')"
+            class="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-650 hover:bg-slate-200 transition">
+            ✕
+          </button>
+        </div>
+
+        <!-- Modal Body Content -->
+        <div class="p-6 space-y-4 text-sm text-slate-600">
+          <div>
+            <span class="text-xs text-slate-400 font-bold block mb-1">Nama Ruangan</span>
+            <p class="font-semibold text-slate-800">{{ item.room.name }}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <span class="text-xs text-slate-400 font-bold block mb-1">Kapasitas</span>
+              <p class="font-semibold text-slate-800">👤 {{ item.room.capacity }} orang</p>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 font-bold block mb-1">Harga per Jam</span>
+              <p class="font-semibold text-indigo-600">Rp {{ item.room.price_per_hour|floatformat:0 }}</p>
+            </div>
+          </div>
+
+          {% if item.occupied and item.active_booking %}
+          <!-- Active Booking details -->
+          <div class="border-t border-slate-100 pt-4 space-y-3">
+            <span class="text-xs text-slate-400 font-bold block">Penyewa Aktif saat Ini</span>
+            <div class="rounded-xl bg-rose-50 border border-rose-100 p-4 space-y-2">
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-semibold">User:</span>
+                <span class="font-bold text-slate-800">{{ item.active_booking.user.username }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-semibold">Paket:</span>
+                <span class="font-bold text-slate-800">{{ item.active_booking.package.name }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-semibold">Waktu:</span>
+                <span class="font-bold text-slate-800">{{ item.active_booking.start_time|time:"H:i" }} - {{
+                  item.active_booking.end_time|time:"H:i" }}</span>
+              </div>
+              {% if item.remaining %}
+              <div class="flex justify-between border-t border-rose-200/50 pt-2 text-rose-700">
+                <span class="font-bold">Sisa Waktu:</span>
+                <span class="font-extrabold">{{ item.remaining }}</span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% elif item.pending_booking %}
+          <!-- Pending Booking details with quick action check-in -->
+          <div class="border-t border-slate-100 pt-4 space-y-3">
+            <span class="text-xs text-slate-400 font-bold block">Pemesanan Tertunda (Konfirmasi Kasir)</span>
+            <div class="rounded-xl bg-amber-50 border border-amber-100 p-4 space-y-2">
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-semibold">User:</span>
+                <span class="font-bold text-slate-800">{{ item.pending_booking.user.username }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-semibold">Paket:</span>
+                <span class="font-bold text-slate-800">{{ item.pending_booking.package.name }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-semibold">Waktu:</span>
+                <span class="font-bold text-slate-800">{{ item.pending_booking.start_time|time:"H:i" }} - {{
+                  item.pending_booking.end_time|time:"H:i" }}</span>
+              </div>
+              <div class="flex justify-between font-bold text-indigo-700 border-t border-amber-200/50 pt-2">
+                <span>Total Tagihan:</span>
+                <span>Rp {{ item.pending_booking.total_price|floatformat:0 }}</span>
+              </div>
+            </div>
+
+            <!-- Quick Check-in action form -->
+            <form action="{% url 'admin_booking_quick_lunas' item.pending_booking.pk %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'admin_floor_plan' %}">
+              <button type="submit" class="w-full btn btn-primary py-3">
+                Konfirmasi Pembayaran (Check-in)
+              </button>
+            </form>
+          </div>
+          {% else %}
+          <div class="border-t border-slate-100 pt-4">
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Ruangan ini dalam keadaan kosong/tersedia saat ini. Gunakan menu <strong>Kelola Pesanan</strong> atau
+              system booking jika ingin menjadwalkan sewa.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center rounded-2xl bg-white border border-dashed border-slate-200 p-16 shadow-sm">
+    <h3 class="font-heading text-lg font-bold text-slate-800">Belum Ada Ruangan Aktif</h3>
+    <p class="text-sm text-slate-500 mt-1">Silakan tambahkan ruangan fisik pada menu Kelola Ruangan.</p>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  function toggleModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.toggle('hidden');
+    }
+  }
+
+  // Close modal when clicking outside form box
+  window.addEventListener('click', function (e) {
+    const modals = document.querySelectorAll('[id^="modal-"]');
+    modals.forEach(modal => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'karaoke/admin/base_admin.html' %}
+
+{% block title %}Dashboard Admin — MelodyRoom{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-8">
+  <!-- Header Title -->
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="font-heading text-3xl font-extrabold text-slate-900">Dashboard Utama</h1>
+      <p class="text-sm text-slate-500 mt-1">Status ringkasan statistik & pesanan terbaru MelodyRoom.</p>
+    </div>
+    
+    <!-- Real-time Time Indicator badge -->
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-100 px-3.5 py-1.5 text-xs font-bold text-indigo-750">
+      <span class="h-2 w-2 rounded-full bg-indigo-500 animate-ping"></span>
+      Sistem Aktif (Real-Time)
+    </span>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- Stat 1 -->
+    <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-3xl font-extrabold text-slate-900 font-heading">{{ stats.total_rooms }}</span>
+          <span class="text-sm font-semibold text-slate-550 block mt-1">Ruangan Aktif</span>
+        </div>
+        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-2xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition duration-300">
+          🎤
+        </span>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition duration-300"></div>
+    </div>
+
+    <!-- Stat 2 -->
+    <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-3xl font-extrabold text-slate-900 font-heading">{{ stats.pending_today }}</span>
+          <span class="text-sm font-semibold text-slate-550 block mt-1">Pending Hari Ini</span>
+        </div>
+        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-2xl text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition duration-300">
+          ⏳
+        </span>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 transform scale-x-0 group-hover:scale-x-100 transition duration-300"></div>
+    </div>
+
+    <!-- Stat 3 -->
+    <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-3xl font-extrabold text-slate-900 font-heading">{{ stats.active_now }}</span>
+          <span class="text-sm font-semibold text-slate-550 block mt-1">Lunas Hari Ini</span>
+        </div>
+        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-2xl text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
+          💵
+        </span>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 transform scale-x-0 group-hover:scale-x-100 transition duration-300"></div>
+    </div>
+
+    <!-- Stat 4 -->
+    <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-3xl font-extrabold text-slate-900 font-heading">{{ stats.total_bookings }}</span>
+          <span class="text-sm font-semibold text-slate-550 block mt-1">Total Pesanan</span>
+        </div>
+        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-50 text-2xl text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition duration-300">
+          🗒️
+        </span>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-pink-500 to-rose-500 transform scale-x-0 group-hover:scale-x-100 transition duration-300"></div>
+    </div>
+  </div>
+
+  <!-- Quick Action Grid -->
+  <div class="bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-lg space-y-4">
+    <div class="max-w-xl space-y-2">
+      <h2 class="font-heading text-xl font-bold">Pintasan Manajemen Cepat</h2>
+      <p class="text-sm text-indigo-200">Gunakan pautan cepat di bawah ini untuk mengelola unit ruangan karaoke, mengkonfirmasi pembayaran, atau melihat denah warnet real-time.</p>
+    </div>
+    <div class="flex flex-wrap gap-3 pt-2">
+      <a href="{% url 'admin_floor_plan' %}" class="btn bg-white text-indigo-900 hover:bg-indigo-50 shadow-md">
+        🗺️ Denah Interaktif
+      </a>
+      <a href="{% url 'admin_booking_list' %}" class="btn border border-white/20 text-white hover:bg-white/10">
+        📋 Konfirmasi Pembayaran
+      </a>
+      <a href="{% url 'admin_room_create' %}" class="btn border border-white/20 text-white hover:bg-white/10">
+        🎤 Tambah Unit Ruang
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Bookings Table -->
+  <div class="space-y-4">
+    <h2 class="font-heading text-xl font-bold text-slate-900">Pemesanan Terbaru</h2>
+    
+    {% if recent_bookings %}
+    <div class="rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <th class="px-6 py-4">ID</th>
+              <th class="px-6 py-4">Member</th>
+              <th class="px-6 py-4">Unit Ruangan</th>
+              <th class="px-6 py-4">Paket Sewa</th>
+              <th class="px-6 py-4">Jadwal Mulai</th>
+              <th class="px-6 py-4">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700">
+            {% for b in recent_bookings %}
+            <tr class="hover:bg-slate-50/50 transition">
+              <td class="px-6 py-4 font-bold text-slate-900">#{{ b.id }}</td>
+              <td class="px-6 py-4 font-semibold text-slate-800">{{ b.user.username }}</td>
+              <td class="px-6 py-4">
+                <span class="font-bold text-indigo-600 block">{{ b.room.room_code }}</span>
+                <span class="text-[10px] text-slate-400 block">{{ b.room.room_type.name }}</span>
+              </td>
+              <td class="px-6 py-4 font-medium text-slate-800">{{ b.package.name }}</td>
+              <td class="px-6 py-4 text-slate-655 font-medium">
+                {{ b.booking_date|date:"d/m/Y" }} <span class="text-xs text-slate-400">{{ b.start_time|time:"H:i" }} WIB</span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="badge
+                  {% if b.status == 'LUNAS' %}badge-lunas
+                  {% elif b.status == 'PENDING' %}badge-pending
+                  {% else %}badge-batal{% endif %}">
+                  {{ b.get_status_display }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center rounded-2xl bg-white border border-dashed border-slate-200 p-12 shadow-sm">
+      <p class="text-sm text-slate-500">Belum ada pesanan terbaru masuk ke sistem.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
